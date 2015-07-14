@@ -1,5 +1,6 @@
 <?php
 /*init xajax */
+
 require_once("xajax/xajax_core/xajax.inc.php");
 $xajax = new xajax();
 include('backend.php');

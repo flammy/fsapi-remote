@@ -5,9 +5,9 @@
 
 
 /* declare functions as xajax function*/
-$xajax->registerFunction("buttonPress");
-$xajax->registerFunction("ListItemPress");
-$xajax->registerFunction("refresh");
+$xajax->register(XAJAX_FUNCTION,"buttonPress");
+$xajax->register(XAJAX_FUNCTION,"ListItemPress");
+$xajax->register(XAJAX_FUNCTION,"refresh");
 
 /*including fsapi*/
 require_once('fsapi/radio.php');
