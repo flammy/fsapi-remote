@@ -12,7 +12,7 @@ git clone https://github.com/flammy/fsapi-remote.git
 
 cd fsapi-remote
 
-git clone https://github.com/flammy/fsapi-remote.git
+git clone https://github.com/flammy/fsapi.git
 
 edit the example credentials in backend.php
 
