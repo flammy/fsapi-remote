@@ -1,19 +1,21 @@
 <?php
 
-/*this file contains all xajax functions*/
 
+/**
+ * This file contains all xajax functions
+ *
+ * all functions 
+ *
+ *
+ */
 
-
-/* declare functions as xajax function*/
+// declare local functions as xajax function:
 $xajax->register(XAJAX_FUNCTION,"buttonPress");
 $xajax->register(XAJAX_FUNCTION,"ListItemPress");
 $xajax->register(XAJAX_FUNCTION,"refresh");
 
-/*including fsapi*/
-require_once('fsapi/radio.php');
-
 /* setup credentials*/
-
+require_once('fsapi/radio.php');
 $radio = new radio();
 $radio->setpin('1337');
 $radio->sethost('192.168.0.46');
@@ -22,7 +24,7 @@ $radio->sethost('192.168.0.46');
 
 
 /**
- *	this function is called via xajax updates values on the website
+ *	this function is called via xajax. It updates all values on the frontend
  *
  *	@return xajaxResponse Object to manipulate the dom
  *
@@ -77,7 +79,6 @@ function refresh(){
 		}
 	}
 	}
-
 	$objResponse->script("update_fields('netRemote_sys_mode_list','".implode('',$modes)."')");
 
 
@@ -87,8 +88,6 @@ function refresh(){
 	$response = $radio->eqPresets();
 	if($response[0] == 1){
 	$eqs = array(-1 => '<a href="#" class="list-group-item disabled">EQS</a>');
-
-
 	foreach($response[1] as $key => $value){
 					if($stats[1]['netRemote.sys.audio.eqPreset'] == $value['label']){
 							$eqs[$key] = '<a id="eqs_'.$key.'" href="#" class="active list-group-item">'.$value['label'].'</a>';
@@ -97,42 +96,28 @@ function refresh(){
 					}
 	}
 	}
-
 	$objResponse->script("update_fields('netRemote_sys_caps_eqPresets_list','".implode('',$eqs)."')");
 
 
 
-	// get presets
+	//  get the list of available favorite stations for the current mode
 	$response = $radio->NavPresets();
 	if($response[0] == 1){
-	$favs = array(-1 => '<a href="#" class="list-group-item disabled">Favorites</a>');
-
-
-	foreach($response[1] as $key => $value){	
-
-					//print_r($value);
-					//if($stats[1]['netRemote.nav.presets'] == $value['label']){
-					//		$favs[$key] = '<a id="eqs_'.$key.'" href="#" class="active list-group-item">'.$value['label'].'</a>';
-					//}else{
-							$favs[$key] = '<a id="favs_'.$key.'" href="#" class="list-group-item">'.$value['name'].'</a>';
-					//}
+			$favs = array(-1 => '<a href="#" class="list-group-item disabled">Favorites</a>');
+			foreach($response[1] as $key => $value){	
+					$favs[$key] = '<a id="favs_'.$key.'" href="#" class="list-group-item">'.$value['name'].'</a>';
+			}
 	}
-	}
-
 	$objResponse->script("update_fields('netRemote_nav_presets_list','".implode('',$favs)."')");
-
-
-
-
-
-
 
 	return $objResponse;
 }
 
 
 /**
- * this function is called via xajax- It is fired by onclick of an list-item 
+ * this function is called via xajax. It is fired by the onclick-event of an list-item 
+ *
+ * 	@var string $id - the id of the list-item. Coinstantaneous the id is used to determine what to do
  *
  *	@return xajaxResponse Object to manipulate the dom
  *	
@@ -159,9 +144,9 @@ function ListItemPress($id){
 }
 
 /**
- *	this function is called via xajax- It is fired by onclick of an button
+ *	this function is called via xajax. It is fired by the onclick-event of an button
  *
- *	@var string $id - the id of the html-button. coinstantaneous the id is used to determine what to do
+ *	@var string $id - the id of the html-button. Coinstantaneous the id is used to determine what to do
  *	
  *	@return xajaxResponse Object to manipulate the dom
  *
@@ -253,7 +238,7 @@ function buttonPress($id){
 			//
 				break;
 	}
-	// Tell the browser it hast to refresh all values after this request
+	// Tell the browser it hast to call our refresh function to refresh all values after this request
 	$objResponse->script("xajax_refresh();");
 	return $objResponse;
 }
