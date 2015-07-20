@@ -16,7 +16,7 @@ require_once('fsapi/radio.php');
 
 $radio = new radio();
 $radio->setpin('1337');
-$radio->sethost('192.168.0.56');
+$radio->sethost('192.168.0.46');
 
 
 
@@ -99,6 +99,32 @@ function refresh(){
 	}
 
 	$objResponse->script("update_fields('netRemote_sys_caps_eqPresets_list','".implode('',$eqs)."')");
+
+
+
+	// get presets
+	$response = $radio->NavPresets();
+	if($response[0] == 1){
+	$favs = array(-1 => '<a href="#" class="list-group-item disabled">Favorites</a>');
+
+
+	foreach($response[1] as $key => $value){	
+
+					//print_r($value);
+					//if($stats[1]['netRemote.nav.presets'] == $value['label']){
+					//		$favs[$key] = '<a id="eqs_'.$key.'" href="#" class="active list-group-item">'.$value['label'].'</a>';
+					//}else{
+							$favs[$key] = '<a id="favs_'.$key.'" href="#" class="list-group-item">'.$value['name'].'</a>';
+					//}
+	}
+	}
+
+	$objResponse->script("update_fields('netRemote_nav_presets_list','".implode('',$favs)."')");
+
+
+
+
+
 
 
 	return $objResponse;

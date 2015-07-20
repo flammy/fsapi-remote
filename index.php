@@ -133,9 +133,9 @@ $xajax->processRequest();
 					</div>
 			  </div>
 			  <div class="col-md-4">
-					<div class="list-group">
+					<div class="list-group netRemote_nav_presets_list">
 					  <a href="#" class="list-group-item disabled">
-					    Source - not implemented yet
+					    Loading Favorites
 					  </a>
 					</div>
 			  </div>
