@@ -110,6 +110,30 @@ function refresh(){
 	}
 	$objResponse->script("update_fields('netRemote_nav_presets_list','".implode('',$favs)."')");
 
+	
+	
+	
+		//  get the list of available navigation items
+	$response = $radio->NavLists();
+	if($response[0] == 1){
+			$navs = array(-1 => '<a href="#" class="list-group-item disabled">Channels</a>');
+			foreach($response[1] as $key => $value){	
+					$navs[$key] = '<a id="navs_'.$key.'" href="#" class="list-group-item">'.$value['name'].'</a>';
+			}
+	}
+	$objResponse->script("update_fields('netRemote_nav_list','".implode('',$navs)."')");
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	return $objResponse;
 }
 
@@ -136,6 +160,9 @@ function ListItemPress($id){
 		break;
 		case 'eqs':
 			$response = $radio->eq_preset($mode_id);
+		break;
+		case 'favs':
+			$response = $radio->SelectFavorite($mode_id);
 		break;
 	}
 	$objResponse->script("xajax_refresh();");

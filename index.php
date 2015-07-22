@@ -125,7 +125,12 @@
 					</div>
 			  </div>
 			  <div class="col-md-4">
-				</div>
+					<div class="list-group netRemote_nav_list">
+					  <a href="#" class="list-group-item disabled">
+					    Loading Channels
+					  </a>
+					</div>
+			  </div>
 			</div>
 		<br/>
 			<div class="row">
