@@ -95,8 +95,8 @@ function refresh(){
 							$eqs[$key] = '<a id="eqs_'.$key.'" href="#" class="list-group-item">'.$value['label'].'</a>';
 					}
 	}
-	}
 	$objResponse->script("update_fields('netRemote_sys_caps_eqPresets_list','".implode('',$eqs)."')");
+	}
 
 
 
@@ -107,8 +107,8 @@ function refresh(){
 			foreach($response[1] as $key => $value){	
 					$favs[$key] = '<a id="favs_'.$key.'" href="#" class="list-group-item">'.$value['name'].'</a>';
 			}
-	}
 	$objResponse->script("update_fields('netRemote_nav_presets_list','".implode('',$favs)."')");
+	}
 
 	
 	
@@ -120,8 +120,8 @@ function refresh(){
 			foreach($response[1] as $key => $value){	
 					$navs[$key] = '<a id="navs_'.$key.'" href="#" class="list-group-item">'.$value['name'].'</a>';
 			}
+		$objResponse->script("update_fields('netRemote_nav_list','".implode('',$navs)."')");
 	}
-	$objResponse->script("update_fields('netRemote_nav_list','".implode('',$navs)."')");
 	
 	
 	
