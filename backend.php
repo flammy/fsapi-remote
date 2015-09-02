@@ -13,6 +13,8 @@
 $xajax->register(XAJAX_FUNCTION,"buttonPress");
 $xajax->register(XAJAX_FUNCTION,"ListItemPress");
 $xajax->register(XAJAX_FUNCTION,"refresh");
+$xajax->register(XAJAX_FUNCTION,"devicescan");
+
 
 /* setup credentials*/
 require_once('fsapi/radio.php');
@@ -269,4 +271,55 @@ function buttonPress($id){
 	$objResponse->script("xajax_refresh();");
 	return $objResponse;
 }
+
+function devicescan(){
+	global $radio;
+	$start = time();
+	$objResponse = new xajaxResponse();
+	$objResponse->script("console.log('".$start ." scan start')");
+	$response = $radio->devicescan();
+	$add_html = "";
+	$add_js = "";
+
+	foreach($response as $row => $dataset){
+					preg_match('([0-9]{1,3}\.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3})', $dataset['location'], $ip);
+
+
+				  $add_html .= '<li class="media">
+				    <div class="media-left media-middle">
+				      <a href="#">
+				        <img class="media-object" src="img/devices/unknown.jpg" alt="device image">
+				      </a>
+				    </div>
+				    <div class="media-body">
+				      <h4 class="media-heading">'.$dataset['details']['device']->friendlyName.'<button type="button" id="add'.$row.'" class="btn btn-primary btn-xs">add </span></button></h4>
+				      '.$dataset['usn'].'<br/>
+				      '.$dataset['location'].'
+				    </div>
+				  </li>';
+				  $add_js = '
+				  $( "#add'.$row.'" ).click(function() {
+					  $("#host").val("'.$ip[0].'");
+					});
+
+				  ';
+	}
+
+
+
+
+	$objResponse->assign("scan","innerHTML", $add_html);
+	$objResponse->script($add_js);
+	$end = time();
+	$objResponse->script("console.log('".$end ." scan end (".($end-$start) ."s)')");
+	return $objResponse;
+}
+
+
+
+
+
+
+
+
 ?>
