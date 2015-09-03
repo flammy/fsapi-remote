@@ -13,7 +13,11 @@
 $xajax->register(XAJAX_FUNCTION,"buttonPress");
 $xajax->register(XAJAX_FUNCTION,"ListItemPress");
 $xajax->register(XAJAX_FUNCTION,"refresh");
+$xajax->register(XAJAX_FUNCTION,"devices");
 $xajax->register(XAJAX_FUNCTION,"devicescan");
+$xajax->register(XAJAX_FUNCTION,"devicesave");
+$xajax->register(XAJAX_FUNCTION,"devicedel");
+
 
 
 /* setup credentials*/
@@ -276,48 +280,254 @@ function devicescan(){
 	global $radio;
 	$start = time();
 	$objResponse = new xajaxResponse();
-	$objResponse->script("console.log('".$start ." scan start')");
 	$response = $radio->devicescan();
 	$add_html = "";
 	$add_js = "";
 
 	foreach($response as $row => $dataset){
-					preg_match('([0-9]{1,3}\.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3})', $dataset['location'], $ip);
+		if(isset($dataset['location'])){
+			if(preg_match('([0-9]{1,3}\.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3})', $dataset['location'], $ip) == 1){
 
-
-				  $add_html .= '<li class="media">
+				$add_html ='
+				  <li class="media">
 				    <div class="media-left media-middle">
 				      <a href="#">
 				        <img class="media-object" src="img/devices/unknown.jpg" alt="device image">
 				      </a>
 				    </div>
 				    <div class="media-body">
-				      <h4 class="media-heading">'.$dataset['details']['device']->friendlyName.'<button type="button" id="add'.$row.'" class="btn btn-primary btn-xs">add </span></button></h4>
+				      <h4 class="media-heading">'.$dataset['details']['device']->friendlyName.' <button type="button" id="add'.$row.'" class="btn btn-primary btn-xs">add </button></h4>
 				      '.$dataset['usn'].'<br/>
 				      '.$dataset['location'].'
 				    </div>
 				  </li>';
 				  $add_js = '
 				  $( "#add'.$row.'" ).click(function() {
+
+
+				  	  $("#index").val("N");
 					  $("#host").val("'.$ip[0].'");
+					  $("#friendlyname").val("'.$dataset['details']['device']->friendlyName.'");
+					});
+
+				  ';
+			}
+		}
+	}
+	if($add_html==""){
+	$add_html = '	<li style="display: none;" id="scanning_devices">
+						<div class="progress">
+						  <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
+							searching for remote devices
+						  </div>
+						</div>
+					</li>
+					<li>No Devices Found, <button type="button" id="rescan" class="btn btn-primary btn-xs">try again </button> or add it manualy.</li>';
+				  $add_js = '
+				  $( "#rescan").click(function() {
+					$( "#scan li" ).each(function( index ) {
+						$( this ).hide();
+					});
+			  		$("#scanning_devices").show()
+				  	xajax_devicescan();
 					});
 
 				  ';
 	}
 
-
-
-
 	$objResponse->assign("scan","innerHTML", $add_html);
 	$objResponse->script($add_js);
 	$end = time();
-	$objResponse->script("console.log('".$end ." scan end (".($end-$start) ."s)')");
+	$objResponse->script("console.log('finnished scan for network devices (".($end-$start) ."s)')");
+	return $objResponse;
+}
+
+function devicesave($index,$host,$pin,$friendlyname){
+	global $radio;
+	$objResponse = new xajaxResponse();
+	$config = array('host' => $host,'pin' =>$pin, 'friendlyname' => $friendlyname);
+	if($index == "N"){
+		config_add($config);
+	}else{
+		config_replace($index,$config);
+	}
+
+	$objResponse->script("xajax_devices();");
+	return $objResponse;
+	
+
+}
+
+
+function devicedel($index){
+	global $radio;
+	$objResponse = new xajaxResponse();
+	config_remove($index);
+	
+
+	$objResponse->script("xajax_devices();");
+	return $objResponse;
+}
+
+function devices(){
+	$start = time();
+	global $radio;
+	$configs = config_read();
+	$objResponse = new xajaxResponse();
+	$add_html = '	<li style="display: none;" id="scanning_local">
+						<div class="progress">
+						  <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
+							loading known devices
+						  </div>
+						</div>
+					</li>';
+	$add_js = "";
+	foreach($configs[1] as $row => $config){
+		preg_match('([0-9]{1,3}\.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3})', $config['host'], $ip);
+		  $add_html .= '<li class="media">
+		    <div class="media-left media-middle">
+		      <a href="#">
+		        <img class="media-object" src="img/devices/unknown.jpg" alt="device image">
+		      </a>
+		    </div>
+		    <div class="media-body">
+		      <h4 class="media-heading">'.$config['friendlyname'].' 
+		      <button type="button" id="add'.$row.'" class="btn btn-primary btn-xs">edit</button>
+		      <button type="button" id="del'.$row.'" class="btn btn-primary btn-xs">del</button>
+		      </h4>
+		      '.$config['host'].'
+		    </div>
+		  </li>';
+		  $add_js .= '
+		  $( "#add'.$row.'" ).click(function() {
+		  	  $("#index").val("'.$row.'");
+			  $("#host").val("'.$ip[0].'");
+			  $("#pin").val("'.$config['pin'].'");
+			  $("#friendlyname").val("'.$config['friendlyname'].'");
+			});
+
+		  $( "#del'.$row.'" ).click(function() {
+		  		xajax_devicedel("'.$row.'");
+			});
+
+		  ';
+	}
+	$objResponse->assign("devices","innerHTML", $add_html);
+	$objResponse->script($add_js);
+	$end = time();
+	$objResponse->script("console.log('finnished loading known devices (".($end-$start) ."s)')");
 	return $objResponse;
 }
 
 
+function config_init(){
+	$file = 'config.txt';
+	if(!file_exists($file )){
+		file_put_contents($file,serialize(array()));
+	}
+	return array(true,$file);
+}
 
+function config_read($file = null){
+	if($file == null){
+		$file = config_init();
+		if($file[0] == true){
+			$file = $file[1];
+		}else{
+			return $file;
+		}
+	}
+	$config = file_get_contents($file);
+	if($config === false){
+		return array(false,'could not read file '.$file);
 
+	}
+	
+	if($config != "" && $config != serialize(false)){
+		$config = unserialize($config);
+		if($config === false){
+			return array(false,'could not unserialize string');
+		}
+	}else{
+		$config = array();
+	}
+	return array(true,$config);
+}
+
+function config_write($config,$file = null){
+	if($file == null){
+		$file = config_init();
+		if($file[0] == true){
+			$file = $file[1];
+		}else{
+			return $file;
+		}
+	}
+	$res = file_put_contents($file,serialize($config));
+	if($res === false){
+		return array(false,'could not save file'.$file);
+	}
+	return array(true);
+}
+
+function config_add($config,$file=null){
+	if($file == null){
+		$file = config_init();
+		if($file[0] == true){
+			$file = $file[1];
+		}else{
+			return $file;
+		}
+	}
+	$configs = config_read();
+	if($configs[0] == false){
+		return $configs;
+	}
+	$configs[1][] = $config;
+	return config_write($configs[1]);
+}
+
+function config_remove($index,$file=null){
+	if($file == null){
+		$file = config_init();
+		if($file[0] == true){
+			$file = $file[1];
+		}else{
+			return $file;
+		}
+	}
+	$configs = config_read();
+	if($configs[0] == false){
+		return $configs;
+	}
+	if(isset($configs[1][$index])){
+		unset($configs[1][$index]);
+	}else{
+		return array(false,'index '.$index.' not found');
+
+	}
+	return config_write($configs[1]);
+}
+
+function config_replace($index,$config,$file = null){
+	if($file == null){
+		$file = config_init();
+		if($file[0] == true){
+			$file = $file[1];
+		}else{
+			return $file;
+		}
+	}
+	$configs = config_read($file);
+	if($configs[0] == false){
+		return $configs;
+	}
+	if(isset($configs[1][$index])){
+		$configs[1][$index] = $config;
+		return config_write($configs[1]);
+	}
+	return array(false,'index '.$index.' not found');
+}
 
 
 

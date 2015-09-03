@@ -1,42 +1,4 @@
 
-		<nav class="navbar navbar-default">
-		  <!--start container-fluid -->
-		  <div class="container-fluid">
-			<!-- start navbar-header -->
-		    <div class="navbar-header">
-		      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
-		        <span class="sr-only">Toggle navigation</span>
-		        <span class="icon-bar"></span>
-		        <span class="icon-bar"></span>
-		        <span class="icon-bar"></span>
-		      </button>
-		      <a class="navbar-brand" href="#">FSAPI-Remote</a>
-		    </div>
-			<!-- end navbar-header -->
-			<!-- start navbar-collapse -->
-		    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-		      <!-- start left navbar -->
-			  <ul class="nav navbar-nav navbar-left">
-		        <li>
-					<button type="button" id="volume-down" class="btn btn-sm btn-default"><span class="glyphicon glyphicon-volume-down" aria-label="Left Align" aria-hidden="true"></span></button>
-					<input type="text"  id="volume"  class="slider netRemote_sys_audio_volume" value="1" data-slider-min="0" data-slider-max="20" data-slider-step="1" data-slider-value="1" data-slider-orientation="horizontal" data-slider-selection="after" data-slider-tooltip="hide">
-					<button type="button" id="volume-up" class="btn btn-sm btn-default"><span class="glyphicon glyphicon-volume-up" aria-label="Left Align" aria-hidden="true"></span></button>
-					<button type="button" id="volume-mute" class="btn btn-sm btn-default netRemote_sys_audio_mute"><span class="glyphicon glyphicon-volume-off" aria-label="Left Align" aria-hidden="true"></span></button>
-		        </li>
-		      </ul>
-			  <!-- end left navbar -->
-			  <!-- end right navbar -->
-		      <ul class="nav navbar-nav navbar-right">
-		        <li>
-				  	<button type="button" id="power" class="btn btn-sm btn-default netRemote_sys_power"><span class="glyphicon glyphicon-off" aria-label="Left Align" aria-hidden="true"></span> ON</button>
-		        </li>
-		      </ul>
-			  <!-- end right navbar -->
-		    </div>
-			<!-- end navbar-collapse -->
-		  </div>
-		 <!--end container-fluid -->
-		</nav>
 		<!-- start player-->
 		<div class="container">
 			<div class="row">
@@ -68,6 +30,14 @@
 
 					<button type="button" id="play-random" class="disabled btn btn-default netRemote_play_shuffle"><span class="glyphicon glyphicon-random" aria-label="Shuffle / Random" aria-hidden="true"></span></button>
 					<button type="button" id="play-repeat" class="disabled btn btn-default netRemote_play_repeat"><span class="glyphicon glyphicon-retweet" aria-label="Repeat" aria-hidden="true"></span></button>
+
+
+
+					<button type="button" id="volume-down" class="btn  btn-default"><span class="glyphicon glyphicon-volume-down" aria-label="Left Align" aria-hidden="true"></span></button>
+					<input type="text"  id="volume"  class="slider netRemote_sys_audio_volume" value="1" data-slider-min="0" data-slider-max="20" data-slider-step="1" data-slider-value="1" data-slider-orientation="horizontal" data-slider-selection="after" data-slider-tooltip="hide">
+					<button type="button" id="volume-up" class="btn  btn-default"><span class="glyphicon glyphicon-volume-up" aria-label="Left Align" aria-hidden="true"></span></button>
+					<button type="button" id="volume-mute" class="btn btn-default netRemote_sys_audio_mute"><span class="glyphicon glyphicon-volume-off" aria-label="Left Align" aria-hidden="true"></span></button>
+
 			  </div>
 			</div>
 		</div>
@@ -837,3 +807,4 @@
 			// new events for new objects
 			addEvents();
 		</script>
+		<!-- end content/home.php -->
