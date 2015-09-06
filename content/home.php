@@ -799,7 +799,7 @@
 				/*
 				 *	Get all values via xajax
 				 */
-				xajax_refresh();
+				//xajax_refresh();
 				/*	not ready yet		
 				 *	$('.slider').slider();
 				 */
