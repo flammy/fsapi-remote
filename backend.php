@@ -17,16 +17,30 @@ $xajax->register(XAJAX_FUNCTION,"devices");
 $xajax->register(XAJAX_FUNCTION,"devicescan");
 $xajax->register(XAJAX_FUNCTION,"devicesave");
 $xajax->register(XAJAX_FUNCTION,"devicedel");
+$xajax->register(XAJAX_FUNCTION,"devicesel");
+
+
+
 
 
 
 /* setup credentials*/
 require_once('fsapi/radio.php');
 $radio = new radio();
-$radio->setpin('1337');
-$radio->sethost('192.168.0.46');
 
-
+$configs = config_read();
+$i = 0;
+$act_device  = "";
+foreach($configs[1]  as $key => $config){
+	if($i == 0){
+		$act_device = $key;
+	}elseif(isset($config['active']) && ($config['active'] == true)) {
+		$act_device = $key;
+	}
+	$i ++;
+}
+$radio->setpin($configs[1][$act_device]['pin']);
+$radio->sethost($configs[1][$act_device]['host']);
 
 
 /**
@@ -44,18 +58,35 @@ function refresh(){
 	// disabled self refering update, needs some blocking
 	//        $objResponse->script("window.setTimeout(xajax_refresh(), 100000 );");
 	// get all known values available via get
-	ob_start();
 	$response = $radio->system_status();
-	ob_end_clean();
+
+
+
+	if($response[0] == false){
+		$objResponse->script("$('#alert-danger').show();");
+		$objResponse->script("setTimeout(\"$('#alert-danger').hide()\", 5000);");
+		$objResponse->assign("alert-danger","innerHTML", $response[1]);
+		return $objResponse;
+	}
+
+
+	if(count($response[1]) < 1){
+		$objResponse->script("$('#alert-danger').show();");
+		$objResponse->script("setTimeout(\"$('#alert-danger').hide()\", 5000);");
+		$objResponse->assign("alert-danger","innerHTML", 'Got an empty resultset from fsapi.');
+		return $objResponse;
+	}
+
+
 	if($response[0] == 1){
 		foreach($response[1] as $key => $value){
 			$objResponse->script("update_fields('".str_replace('.','_',$key)."','".$value."')");
-
 		}
 	}
 
 	$stats= $response;
 
+	//print_r($stats);
 
 
 	// define meta status for toggeling multiple buttons with one value
@@ -171,6 +202,15 @@ function ListItemPress($id){
 			$response = $radio->SelectFavorite($mode_id);
 		break;
 	}
+
+
+	if($response[0] == false){
+		$objResponse->script("$('#alert-danger').show();");
+		$objResponse->script("setTimeout(\"$('#alert-danger').hide()\", 5000);");
+		$objResponse->assign("alert-danger","innerHTML", $response[1]);
+		return $objResponse;
+	}
+
 	$objResponse->script("xajax_refresh();");
 	return $objResponse;
 
@@ -248,7 +288,6 @@ function buttonPress($id){
 				break;
 		case 'play-pause':
 			$response = $radio->control('pause');
-				print_r($response);
 			break;
 		case 'play-stop':
 			$response = $radio->control('stop');
@@ -271,6 +310,13 @@ function buttonPress($id){
 			//
 				break;
 	}
+	if($response[0] == false){
+		$objResponse->script("$('#alert-danger').show();");
+		$objResponse->script("setTimeout(\"$('#alert-danger').hide()\", 5000);");
+		$objResponse->assign("alert-danger","innerHTML", $response[1]);
+	}
+
+
 	// Tell the browser it hast to call our refresh function to refresh all values after this request
 	$objResponse->script("xajax_refresh();");
 	return $objResponse;
@@ -281,12 +327,20 @@ function devicescan(){
 	$start = time();
 	$objResponse = new xajaxResponse();
 	$response = $radio->devicescan();
+
+	if($response[0] == false){
+		$objResponse->script("$('#alert-danger').show();");
+		$objResponse->script("setTimeout(\"$('#alert-danger').hide()\", 5000);");
+		$objResponse->assign("alert-danger","innerHTML", $response[1]);
+		return $objResponse;
+	}
+
 	$add_html = "";
 	$add_js = "";
 
-	foreach($response as $row => $dataset){
+	foreach($response[1] as $row => $dataset){
 		if(isset($dataset['location'])){
-			if(preg_match('([0-9]{1,3}\.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3})', $dataset['location'], $ip) == 1){
+			if(preg_match('([0-9]{1,3}\.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3})', $dataset['details']['webfsapi'], $ip) == 1){
 
 				$add_html ='
 				  <li class="media">
@@ -296,9 +350,9 @@ function devicescan(){
 				      </a>
 				    </div>
 				    <div class="media-body">
-				      <h4 class="media-heading">'.$dataset['details']['device']->friendlyName.' <button type="button" id="add'.$row.'" class="btn btn-primary btn-xs">add </button></h4>
-				      '.$dataset['usn'].'<br/>
-				      '.$dataset['location'].'
+				      <h4 class="media-heading">'.$dataset['details']['friendlyName'].' <button type="button" id="add'.$row.'" class="btn btn-primary btn-xs">add </button></h4>
+				      '.$dataset['details']['version'].'<br/>
+				      '.$dataset['details']['webfsapi'].'
 				    </div>
 				  </li>';
 				  $add_js = '
@@ -307,7 +361,7 @@ function devicescan(){
 
 				  	  $("#index").val("N");
 					  $("#host").val("'.$ip[0].'");
-					  $("#friendlyname").val("'.$dataset['details']['device']->friendlyName.'");
+					  $("#friendlyname").val("'.$dataset['details']['friendlyName'].'");
 					});
 
 				  ';
@@ -347,9 +401,16 @@ function devicesave($index,$host,$pin,$friendlyname){
 	$objResponse = new xajaxResponse();
 	$config = array('host' => $host,'pin' =>$pin, 'friendlyname' => $friendlyname);
 	if($index == "N"){
-		config_add($config);
+		$response = config_add($config);
 	}else{
-		config_replace($index,$config);
+		$response = config_replace($index,$config);
+	}
+
+	if($response[0] == false){
+		$objResponse->script("$('#alert-danger').show();");
+		$objResponse->script("setTimeout(\"$('#alert-danger').hide()\", 5000);");
+		$objResponse->assign("alert-danger","innerHTML", $response[1]);
+		return $objResponse;
 	}
 
 	$objResponse->script("xajax_devices();");
@@ -362,17 +423,68 @@ function devicesave($index,$host,$pin,$friendlyname){
 function devicedel($index){
 	global $radio;
 	$objResponse = new xajaxResponse();
-	config_remove($index);
-	
-
+	$response = config_remove($index);
+	if($response[0] == false){
+		$objResponse->script("$('#alert-danger').show();");
+		$objResponse->script("setTimeout(\"$('#alert-danger').hide()\", 5000);");
+		$objResponse->assign("alert-danger","innerHTML", $response[1]);
+		return $objResponse;
+	}
 	$objResponse->script("xajax_devices();");
 	return $objResponse;
 }
+
+
+function devicesel($index){
+	global $radio;
+	$objResponse = new xajaxResponse();
+	$config = config_read();
+	if($config[0] == false){
+		$objResponse->script("$('#alert-danger').show();");
+		$objResponse->script("setTimeout(\"$('#alert-danger').hide()\", 5000);");
+		$objResponse->assign("alert-danger","innerHTML", $config[1]);
+		return $objResponse;
+	}
+
+	foreach($config[1] as $k => $v){
+		if($index == $k){
+			$config[1][$k]['active'] = true;
+		}else{
+			unset($config[1][$k]['active']);
+		}
+	}
+
+
+
+	$response = config_write($config[1]);
+
+	if($response[0] == false){
+		$objResponse->script("$('#alert-danger').show();");
+		$objResponse->script("setTimeout(\"$('#alert-danger').hide()\", 5000);");
+		$objResponse->assign("alert-danger","innerHTML", $response[1]);
+		return $objResponse;
+	}
+	
+	$objResponse->script("$('#devicesel').val(".$index.");");
+	$objResponse->script("xajax_refresh();");
+	return $objResponse;
+}
+
+
 
 function devices(){
 	$start = time();
 	global $radio;
 	$configs = config_read();
+
+	if($configs[0] == false){
+		$objResponse->script("$('#alert-danger').show();");
+		$objResponse->script("setTimeout(\"$('#alert-danger').hide()\", 5000);");
+		$objResponse->assign("alert-danger","innerHTML", $configs[1]);
+		return $objResponse;
+	}
+
+
 	$objResponse = new xajaxResponse();
 	$add_html = '	<li style="display: none;" id="scanning_local">
 						<div class="progress">
