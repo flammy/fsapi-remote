@@ -4,7 +4,6 @@
 	include('backend.php');
 	$xajax->processRequest();
 	$configs = config_read();
-
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -28,10 +27,30 @@
 	<?php 
 	$xajax->configure('javascript URI','/fsapi-remote/xajax/');
 	$xajax->printJavascript(); 
+	// determine active device
+	
+	if(!isset($_REQUEST['setup']) || $_REQUEST['setup'] != true){
+		echo '<script type="text/javascript">';
+		$i = 0;
+		$act_device  = "";
+		foreach($configs[1]  as $key => $config){
+			if($i == 0){
+				$act_device = $key;
+			}elseif(isset($config['active']) && ($config['active'] == true)) {
+				$act_device = $key;
+				echo 'console.log("loading last active device: '.$key.'");';
+			}
+			$i ++;
+		}
+		
+		echo "xajax_devicesel(".$act_device.");";
+	}
+	echo '</script>';
 	?>
 	<!-- end xajax-js-->
 	</head>
 	<body>
+
 		<!-- start content/home.php -->
 		<nav class="navbar navbar-default">
 		  <!--start container-fluid -->
@@ -55,8 +74,11 @@
 		      <!-- start left navbar -->
 			  <ul class="nav navbar-nav navbar-left">
 			  	<li>
+			  		<?php
+						if(!isset($_REQUEST['setup']) || $_REQUEST['setup'] != true){
+			  		?>
 			  		<form class="form-inline" style="margin-top: 7px;">
-					<select class="form-control">
+					<select class="form-control" id="devicesel">
 						<?php
 
 						foreach($configs[1] as $index => $config){
@@ -68,6 +90,9 @@
 						echo '<a href="'.((isset($_SERVER['HTTPS']) &&  $_SERVER['HTTPS'] != "") ? 'https://' : 'http://').$_SERVER['HTTP_HOST'].$_SERVER['PHP_SELF'].'?setup=true" class="btn btn-default">setup</a>';
 					?>
 					</form>
+					<?php
+						}
+					?>
 			  	</li>
 		      </ul>
 			  <!-- end left navbar -->
@@ -83,6 +108,10 @@
 		  </div>
 		 <!--end container-fluid -->
 		</nav>
+			<div id="alert-success" class="alert alert-success" role="alert" style="display: none;"></div>
+			<div id="alert-info" class="alert alert-info" role="alert" style="display: none;"></div>
+			<div id="alert-warning" class="alert alert-warning" role="alert" style="display: none;"></div>
+			<div id="alert-danger" class="alert alert-danger" role="alert" style="display: none;"></div>
 		<?php
 		if(isset($_REQUEST['setup']) && $_REQUEST['setup'] == true){
 			include('content/setup.php');
@@ -92,5 +121,11 @@
 
 		}
 		?>
+		<script type="text/javascript">
+
+				$('#devicesel').change( function() {
+						xajax_devicesel($(this).val());
+				});
+		</script>
 	</body>
 </html>
