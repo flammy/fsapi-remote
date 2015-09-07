@@ -14,8 +14,6 @@ cd fsapi-remote
 
 git clone https://github.com/flammy/fsapi.git
 
-edit the example credentials in backend.php
+Make sure your webserver has write-access to config.txt.
 
-$radio->setpin('1337'); // Radio PI
-
-$radio->sethost('192.168.0.56'); // Radio IP
+Now you can add your device with the setup button in the navigation bar.
