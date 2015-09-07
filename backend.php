@@ -27,22 +27,22 @@ $xajax->register(XAJAX_FUNCTION,"devicesel");
 /* setup credentials*/
 require_once('fsapi/radio.php');
 $radio = new radio();
-
 $configs = config_read();
-$i = 0;
-$act_device  = "";
-foreach($configs[1]  as $key => $config){
-	if($i == 0){
-		$act_device = $key;
-	}elseif(isset($config['active']) && ($config['active'] == true)) {
-		$act_device = $key;
+if(($configs[0] == true) && (count($configs[1]) > 0)){
+	$i = 0;
+	$act_device  = "";
+	foreach($configs[1]  as $key => $config){
+		if($i == 0){
+			$act_device = $key;
+		}elseif(isset($config['active']) && ($config['active'] == true)) {
+			$act_device = $key;
+		}
+		$i ++;
 	}
-	$i ++;
+
+	$radio->setpin($configs[1][$act_device]['pin']);
+	$radio->sethost($configs[1][$act_device]['host']);
 }
-$radio->setpin($configs[1][$act_device]['pin']);
-$radio->sethost($configs[1][$act_device]['host']);
-
-
 /**
  *	this function is called via xajax. It updates all values on the frontend
  *
@@ -435,7 +435,7 @@ function devicedel($index){
 }
 
 
-function devicesel($index){
+function devicesel($index = false){
 	global $radio;
 	$objResponse = new xajaxResponse();
 	$config = config_read();
@@ -445,6 +445,20 @@ function devicesel($index){
 		$objResponse->assign("alert-danger","innerHTML", $config[1]);
 		return $objResponse;
 	}
+	if(count($config[1]) < 1){
+		$objResponse->script("$('#alert-danger').show();");
+		$objResponse->script("setTimeout(\"$('#alert-danger').hide()\", 5000);");
+		$objResponse->assign("alert-danger","innerHTML", 'No configured device found, please use setup to add new devices.');
+		return $objResponse;
+	}
+	if($index == false){
+		$objResponse->script("$('#alert-danger').show();");
+		$objResponse->script("setTimeout(\"$('#alert-danger').hide()\", 5000);");
+		$objResponse->assign("alert-danger","innerHTML", 'No device selected');
+		return $objResponse;
+	}
+
+
 
 	foreach($config[1] as $k => $v){
 		if($index == $k){
