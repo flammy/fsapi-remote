@@ -201,6 +201,9 @@ function ListItemPress($id){
 		case 'favs':
 			$response = $radio->SelectFavorite($mode_id);
 		break;
+		case 'navs':
+			$response = $radio->selectNavItem($mode_id);
+		break;
 	}
 
 
@@ -451,12 +454,14 @@ function devicesel($index = false){
 		$objResponse->assign("alert-danger","innerHTML", 'No configured device found, please use setup to add new devices.');
 		return $objResponse;
 	}
+
 	if($index == false){
-		$objResponse->script("$('#alert-danger').show();");
-		$objResponse->script("setTimeout(\"$('#alert-danger').hide()\", 5000);");
-		$objResponse->assign("alert-danger","innerHTML", 'No device selected');
-		return $objResponse;
+		$objResponse->script("$('#alert-info').show();");
+		$objResponse->script("setTimeout(\"$('#alert-info').hide()\", 5000);");
+		$objResponse->assign("alert-info","innerHTML", 'No device selected, using first device in config as default.');
+		
 	}
+
 
 
 
