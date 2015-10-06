@@ -24,7 +24,7 @@
 			  <div class="well">
 			  <h2>add device</h2>
 				<form>
-				<input type="hidden" class="form-control" autocomplete="off" name="index" id="index">
+				<input type="hidden" class="form-control" autocomplete="off" value="N" name="index" id="index">
 				  <div class="form-group">
 				    <label for="host">IP / Hostname</label>
 				    <input type="text" class="form-control" name="host" id="host" autocomplete="off" required="required" placeholder="192.168.0.1">
