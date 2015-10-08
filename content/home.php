@@ -22,16 +22,14 @@
 
 					<button type="button" id="play-start" class="disabled btn btn-default netRemote_play_status_play"><span class="glyphicon glyphicon-play" aria-label="Left Align" aria-hidden="true"></span></button>
 
-					<button type="button" id="play-pause" class="disabled btn btn-default"><span class="glyphicon glyphicon-pause netRemote_play_status_pause" aria-label="Left Align" aria-hidden="true"></span></button>
+					<button type="button" id="play-pause" class="disabled btn btn-default netRemote_play_status_pause"><span class="glyphicon glyphicon-pause" aria-label="Left Align" aria-hidden="true"></span></button>
 
-					<button type="button" id="play-stop" class="disabled btn btn-default"><span class="glyphicon glyphicon-stop netRemote_play_status_stop" aria-label="Left Align" aria-hidden="true"></span></button>
+					<button type="button" id="play-stop" class="disabled btn btn-default  netRemote_play_status_stop"><span class="glyphicon glyphicon-stop" aria-label="Left Align" aria-hidden="true"></span></button>
 
 					<button type="button" id="play-step-forward" class="disabled btn btn-default"><span class="glyphicon glyphicon-step-forward" aria-label="Left Align" aria-hidden="true"></span></button>
 
-					<button type="button" id="play-random" class="disabled btn btn-default netRemote_play_shuffle"><span class="glyphicon glyphicon-random" aria-label="Shuffle / Random" aria-hidden="true"></span></button>
-					<button type="button" id="play-repeat" class="disabled btn btn-default netRemote_play_repeat"><span class="glyphicon glyphicon-retweet" aria-label="Repeat" aria-hidden="true"></span></button>
-
-
+					<button type="button" id="play-random" class=" btn btn-default netRemote_play_shuffle"><span class="glyphicon glyphicon-random" aria-label="Shuffle / Random" aria-hidden="true"></span></button>
+					<button type="button" id="play-repeat" class=" btn btn-default netRemote_play_repeat"><span class="glyphicon glyphicon-retweet" aria-label="Repeat" aria-hidden="true"></span></button>
 
 					<button type="button" id="volume-down" class="btn  btn-default"><span class="glyphicon glyphicon-volume-down" aria-label="Left Align" aria-hidden="true"></span></button>
 					<input type="text"  id="volume"  class="slider netRemote_sys_audio_volume" value="1" data-slider-min="0" data-slider-max="20" data-slider-step="1" data-slider-value="1" data-slider-orientation="horizontal" data-slider-selection="after" data-slider-tooltip="hide">
