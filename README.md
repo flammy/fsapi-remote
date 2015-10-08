@@ -17,3 +17,5 @@ git clone https://github.com/flammy/fsapi.git
 Make sure your webserver has write-access to config.txt.
 
 Now you can add your device with the setup button in the navigation bar.
+
+If you have any feature requests or found some bugs, please open an issue.
