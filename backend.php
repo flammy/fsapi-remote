@@ -19,15 +19,11 @@ $xajax->register(XAJAX_FUNCTION,"devicesave");
 $xajax->register(XAJAX_FUNCTION,"devicedel");
 $xajax->register(XAJAX_FUNCTION,"devicesel");
 
-
-
-
-
-
 /* setup credentials*/
 require_once('fsapi/radio.php');
 $radio = new radio();
 $configs = config_read();
+// determine the last active device
 if(($configs[0] == true) && (count($configs[1]) > 0)){
 	$i = 0;
 	$act_device  = "";
@@ -39,68 +35,59 @@ if(($configs[0] == true) && (count($configs[1]) > 0)){
 		}
 		$i ++;
 	}
-
+	// use this device as active device
 	$radio->setpin($configs[1][$act_device]['pin']);
 	$radio->sethost($configs[1][$act_device]['host']);
 }
+
+
 /**
  *	this function is called via xajax. It updates all values on the frontend
  *
  *	@return xajaxResponse Object to manipulate the dom
  *
  */
-
-
 function refresh(){
 	global $radio;
 	$objResponse = new xajaxResponse();
 	$objResponse->script("console.log('refresh');");
 	// disabled self refering update, needs some blocking
 	//        $objResponse->script("window.setTimeout(xajax_refresh(), 100000 );");
+	
 	// get all known values available via get
-	$response = $radio->system_status();
-
-
-
-	if($response[0] == false){
+	$stats = $radio->system_status();
+	
+	// There was an error
+	if($stats[0] == false){
 		$objResponse->script("$('#alert-danger').show();");
 		$objResponse->script("setTimeout(\"$('#alert-danger').hide()\", 5000);");
-		$objResponse->assign("alert-danger","innerHTML", $response[1]);
+		$objResponse->assign("alert-danger","innerHTML", $stats[1]);
 		return $objResponse;
 	}
 
-
-	if(count($response[1]) < 1){
+	// The resultset is empty
+	if(count($stats[1]) < 1){
 		$objResponse->script("$('#alert-danger').show();");
 		$objResponse->script("setTimeout(\"$('#alert-danger').hide()\", 5000);");
 		$objResponse->assign("alert-danger","innerHTML", 'Got an empty resultset from fsapi.');
 		return $objResponse;
 	}
 
-
-	if($response[0] == 1){
-		foreach($response[1] as $key => $value){
+	// Everything is okay
+	if($stats[0] == 1){
+		foreach($stats[1] as $key => $value){
 			$objResponse->script("update_fields('".str_replace('.','_',$key)."','".$value."')");
 		}
 	}
 
-	$stats= $response;
-
-	//print_r($stats);
-
-
 	// define meta status for toggeling multiple buttons with one value
 	if($stats[1]['netRemote.play.status'] == 'playing'){
 		 $objResponse->script("update_fields('netRemote_play_status_play','on')");
-
 	}elseif($stats[1]['netRemote.play.status'] == 'stopped'){
 		 $objResponse->script("update_fields('netRemote_play_status_stop','on')");
-
 	}elseif($stats[1]['netRemote.play.status'] == 'paused'){
 		 $objResponse->script("update_fields('netRemote_play_status_pause','on')");
 	}
-
-
 
 	// get the list of available modes
 	$response = $radio->validModes();
@@ -118,24 +105,19 @@ function refresh(){
 	}
 	$objResponse->script("update_fields('netRemote_sys_mode_list','".implode('',$modes)."')");
 
-
-
-
 	// get the list of available eqs-presets
 	$response = $radio->eqPresets();
 	if($response[0] == 1){
-	$eqs = array(-1 => '<a href="#" class="list-group-item disabled">EQS</a>');
-	foreach($response[1] as $key => $value){
-					if($stats[1]['netRemote.sys.audio.eqPreset'] == $value['label']){
-							$eqs[$key] = '<a id="eqs_'.$key.'" href="#" class="active list-group-item">'.$value['label'].'</a>';
-					}else{
-							$eqs[$key] = '<a id="eqs_'.$key.'" href="#" class="list-group-item">'.$value['label'].'</a>';
-					}
+		$eqs = array(-1 => '<a href="#" class="list-group-item disabled">EQS</a>');
+		foreach($response[1] as $key => $value){
+						if($stats[1]['netRemote.sys.audio.eqPreset'] == $value['label']){
+								$eqs[$key] = '<a id="eqs_'.$key.'" href="#" class="active list-group-item">'.$value['label'].'</a>';
+						}else{
+								$eqs[$key] = '<a id="eqs_'.$key.'" href="#" class="list-group-item">'.$value['label'].'</a>';
+						}
+		}
+		$objResponse->script("update_fields('netRemote_sys_caps_eqPresets_list','".implode('',$eqs)."')");
 	}
-	$objResponse->script("update_fields('netRemote_sys_caps_eqPresets_list','".implode('',$eqs)."')");
-	}
-
-
 
 	//  get the list of available favorite stations for the current mode
 	$response = $radio->NavPresets();
@@ -147,10 +129,7 @@ function refresh(){
 	$objResponse->script("update_fields('netRemote_nav_presets_list','".implode('',$favs)."')");
 	}
 
-	
-	
-	
-		//  get the list of available navigation items
+	//  get the list of available navigation items
 	$response = $radio->NavLists();
 	if($response[0] == 1){
 			$navs = array(-1 => '<a href="#" class="list-group-item disabled">Channels</a>');
@@ -159,18 +138,6 @@ function refresh(){
 			}
 		$objResponse->script("update_fields('netRemote_nav_list','".implode('',$navs)."')");
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 	return $objResponse;
 }
 
@@ -183,41 +150,41 @@ function refresh(){
  *	@return xajaxResponse Object to manipulate the dom
  *	
  */
-
-
 function ListItemPress($id){
 	global $radio;
 	$objResponse = new xajaxResponse();
-	$objResponse->script("console.log('".$id."');");
 	list($type,$mode_id) = explode("_",$id);
-
 	switch($type){
 		case 'mode':
+			// Change mode
 			$response = $radio->mode($mode_id);
 		break;
 		case 'eqs':
+			// Change eq-preset 
 			$response = $radio->eq_preset($mode_id);
 		break;
 		case 'favs':
+			// Select channel from favourites 
 			$response = $radio->SelectFavorite($mode_id);
 		break;
 		case 'navs':
+			// Select an navigation item
 			$response = $radio->selectNavItem($mode_id);
 		break;
 	}
-
-
+	// check if everythink is ok
 	if($response[0] == false){
 		$objResponse->script("$('#alert-danger').show();");
 		$objResponse->script("setTimeout(\"$('#alert-danger').hide()\", 5000);");
 		$objResponse->assign("alert-danger","innerHTML", $response[1]);
 		return $objResponse;
 	}
-
+	// Tell the browser it should fire xajax_refresh to get all new values
 	$objResponse->script("xajax_refresh();");
 	return $objResponse;
 
 }
+
 
 /**
  *	this function is called via xajax. It is fired by the onclick-event of an button
@@ -227,29 +194,19 @@ function ListItemPress($id){
  *	@return xajaxResponse Object to manipulate the dom
  *
  */
-
-
 function buttonPress($id){
 	global $radio;
-
 	$objResponse = new xajaxResponse();
 	$objResponse->script("console.log('".$id."');");
-
 	switch($id){
 		case 'volume-up':
-			ob_start();
                 $response = $radio->volume('up');
-			ob_end_clean();
 			break;
 		case 'volume-down':
-					ob_start();
 					$response = $radio->volume('down');
-					ob_end_clean();
 			break;
 		case 'volume-mute':
-			ob_start();
 			$response = $radio->mute('toggle');
-			ob_end_clean();
 			if($response[0] == 1){
 				if($response[1] == 'on'){
 					$objResponse->script("$('#".$id."').removeClass( 'btn-default' )");
@@ -259,11 +216,9 @@ function buttonPress($id){
 					$objResponse->script("$('#".$id."').addClass( 'btn-default' )");
 				}
 			}
-				break;
+			break;
 		case 'power':
-			ob_start();
 			$response = $radio->power('toggle');
-			ob_end_clean();
 			if($response[0] == 1){
 				if($response[1] == 'on'){
 					$objResponse->script("$('#".$id."').removeClass( 'btn-danger' )");
@@ -275,42 +230,39 @@ function buttonPress($id){
 					$objResponse->script("$('#".$id."').html('<span class=\"glyphicon glyphicon-off\" aria-label=\"Left Align\" aria-hidden=\"true\"></span> OFF')");
 				}
 			}
-				break;
+			break;
 		case 'play-step-backward':
-			//
-				break;
+			// not implemented yet
+			break;
 		case 'play-fast-backward':
-			//
-				break;
+			// not implemented yet
+			break;
 		case 'play-backward':
-			//
-				break;
+			// not implemented yet
+			break;
 		case 'play-start':
 			$response = $radio->control('play');
-			//
-				break;
+			break;
 		case 'play-pause':
 			$response = $radio->control('pause');
 			break;
 		case 'play-stop':
 			$response = $radio->control('stop');
-	
-			//
 				break;
 		case 'play-forward':
-			//
+			// not implemented yet
 				break;
 		case 'play-fast-forward':
-			//
+			// not implemented yet
 				break;
 		case 'play-step-forward':
-			//
+			// not implemented yet
 				break;
 		case 'play-random':
-			//
-				break;
+			$response = $radio->shuffle('toggle');
+			break;
 		case 'play-repeat':
-			//
+			$response = $radio->repeat('toggle');
 				break;
 	}
 	if($response[0] == false){
@@ -325,6 +277,13 @@ function buttonPress($id){
 	return $objResponse;
 }
 
+
+/**
+ *	this function is called via xajax. It does a device scan via ssdp
+ *	
+ *	@return xajaxResponse Object to manipulate the dom
+ *
+ */
 function devicescan(){
 	global $radio;
 	$start = time();
@@ -399,6 +358,13 @@ function devicescan(){
 	return $objResponse;
 }
 
+
+/**
+ *	this function is called via xajax. It saves a recovered device into config
+ *	
+ *	@return xajaxResponse Object to manipulate the dom
+ *
+ */
 function devicesave($index,$host,$pin,$friendlyname){
 	global $radio;
 	$objResponse = new xajaxResponse();
@@ -423,6 +389,12 @@ function devicesave($index,$host,$pin,$friendlyname){
 }
 
 
+/**
+ *	this function is called via xajax. It deletes a recovered device from config
+ *	
+ *	@return xajaxResponse Object to manipulate the dom
+ *
+ */
 function devicedel($index){
 	global $radio;
 	$objResponse = new xajaxResponse();
@@ -438,6 +410,12 @@ function devicedel($index){
 }
 
 
+/**
+ *	this function is called via xajax. It selects and activates a recovered device from config
+ *	
+ *	@return xajaxResponse Object to manipulate the dom
+ *
+ */
 function devicesel($index = false){
 	global $radio;
 	$objResponse = new xajaxResponse();
@@ -461,10 +439,7 @@ function devicesel($index = false){
 		$objResponse->assign("alert-info","innerHTML", 'No device selected, using first device in config as default.');
 		
 	}
-
-
-
-
+	
 	foreach($config[1] as $k => $v){
 		if($index == $k){
 			$config[1][$k]['active'] = true;
@@ -472,8 +447,6 @@ function devicesel($index = false){
 			unset($config[1][$k]['active']);
 		}
 	}
-
-
 
 	$response = config_write($config[1]);
 
@@ -490,7 +463,12 @@ function devicesel($index = false){
 }
 
 
-
+/**
+ *	this function is called via xajax. It outputs all saved devices from config
+ *	
+ *	@return xajaxResponse Object to manipulate the dom
+ *
+ */
 function devices(){
 	$start = time();
 	global $radio;
@@ -551,6 +529,12 @@ function devices(){
 }
 
 
+/**
+ *	this function initiates the main config file
+ *	
+ *	@return string filename for configfile
+ *
+ */
 function config_init(){
 	$file = 'config.txt';
 	if(!file_exists($file )){
@@ -559,6 +543,13 @@ function config_init(){
 	return array(true,$file);
 }
 
+
+/**
+ *	this function reads the main config file
+ *	
+ *	@return array config
+ *
+ */
 function config_read($file = null){
 	if($file == null){
 		$file = config_init();
@@ -585,6 +576,18 @@ function config_read($file = null){
 	return array(true,$config);
 }
 
+
+
+/**
+ *	this function reads the main config file
+ *
+ *  @var string $config - the new config
+ *
+ *  @var string $file - name of the configfile
+ *	
+ *	@return array with success-state
+ *
+ */
 function config_write($config,$file = null){
 	if($file == null){
 		$file = config_init();
@@ -601,6 +604,18 @@ function config_write($config,$file = null){
 	return array(true);
 }
 
+
+
+/**
+ *	this function adds a config line
+ *
+ *  @var string $config - the new config
+ *
+ *  @var string $file - name of the configfile
+ *	
+ *	@return array with success-state
+ *
+ */
 function config_add($config,$file=null){
 	if($file == null){
 		$file = config_init();
@@ -618,6 +633,17 @@ function config_add($config,$file=null){
 	return config_write($configs[1]);
 }
 
+
+/**
+ *	this function deletes a config line
+ *
+ *  @var string $index - index of the configline
+ *
+ *  @var string $file - name of the configfile
+ *	
+ *	@return array with success-state
+ *
+ */
 function config_remove($index,$file=null){
 	if($file == null){
 		$file = config_init();
@@ -640,6 +666,19 @@ function config_remove($index,$file=null){
 	return config_write($configs[1]);
 }
 
+
+/**
+ *	this function replaces a config line
+ *
+ *  @var string $index - index of the old configline
+ *
+ *  @var string $config - the new configline
+ *
+ *  @var string $file - name of the configfile
+ *	
+ *	@return array with success-state
+ *
+ */
 function config_replace($index,$config,$file = null){
 	if($file == null){
 		$file = config_init();
