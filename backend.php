@@ -92,7 +92,7 @@ function refresh(){
 	// get the list of available modes
 	$response = $radio->validModes();
 	if($response[0] == 1){
-	$modes = array(-1 => '<a href="#" class="list-group-item disabled">Mode</a>');
+	$modes = array(-2 => '<a href="#" class="list-group-item disabled">Mode</a>');
 	foreach($response[1] as $key => $value){
 		if($value['selectable'] == 1){
 			if($stats[1]['netRemote.sys.mode'] == $value['label']){
@@ -108,7 +108,7 @@ function refresh(){
 	// get the list of available eqs-presets
 	$response = $radio->eqPresets();
 	if($response[0] == 1){
-		$eqs = array(-1 => '<a href="#" class="list-group-item disabled">EQS</a>');
+		$eqs = array(-2 => '<a href="#" class="list-group-item disabled">EQS</a>');
 		foreach($response[1] as $key => $value){
 						if($stats[1]['netRemote.sys.audio.eqPreset'] == $value['label']){
 								$eqs[$key] = '<a id="eqs_'.$key.'" href="#" class="active list-group-item">'.$value['label'].'</a>';
@@ -122,7 +122,7 @@ function refresh(){
 	//  get the list of available favorite stations for the current mode
 	$response = $radio->NavPresets();
 	if($response[0] == 1){
-			$favs = array(-1 => '<a href="#" class="list-group-item disabled">Favorites</a>');
+			$favs = array(-2 => '<a href="#" class="list-group-item disabled">Favorites</a>');
 			foreach($response[1] as $key => $value){	
 					$favs[$key] = '<a id="favs_'.$key.'" href="#" class="list-group-item">'.$value['name'].'</a>';
 			}
@@ -132,9 +132,15 @@ function refresh(){
 	//  get the list of available navigation items
 	$response = $radio->NavLists();
 	if($response[0] == 1){
-			$navs = array(-1 => '<a href="#" class="list-group-item disabled">Channels</a>');
-			foreach($response[1] as $key => $value){	
-					$navs[$key] = '<a id="navs_'.$key.'" href="#" class="list-group-item">'.$value['name'].'</a>';
+			$navs = array(-2 => '<a href="#" class="list-group-item disabled">Channels</a>');
+			foreach($response[1] as $key => $value){
+					if($value['type'] == 0){
+						$navs[$key] = '<a id="navs_'.$key.'" href="#" class="list-group-item"><span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span>&nbsp;&nbsp;'.$value['name'].'</a>';
+					}elseif($value['type'] == 1){
+						$navs[$key] = '<a id="navs_'.$key.'" href="#" class="list-group-item"><span class="glyphicon glyphicon-music" aria-hidden="true"></span>&nbsp;&nbsp;'.$value['name'].'</a>';
+					}else{
+						$navs[$key] = '<a href="#" class="list-group-item disabled"><span class="glyphicon glyphicon-file" aria-hidden="true"></span>&nbsp;'.$value['name'].'('.$value['type'].'-'.$value['subtype'].')</a>';
+					}
 			}
 		$objResponse->script("update_fields('netRemote_nav_list','".implode('',$navs)."')");
 	}
@@ -169,7 +175,7 @@ function ListItemPress($id){
 		break;
 		case 'navs':
 			// Select an navigation item
-			$response = $radio->selectNavItem($mode_id);
+			$response = $radio->openNavItem($mode_id);
 		break;
 	}
 	// check if everythink is ok
