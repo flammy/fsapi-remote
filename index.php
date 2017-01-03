@@ -1,9 +1,19 @@
 <?php
-	require_once("xajax/xajax_core/xajax.inc.php");
-	$xajax = new xajax();
-	include('backend.php');
-	$xajax->processRequest();
-	$configs = config_read();
+	//require_once("vendor/autoload.php");
+	require_once('src/autoload.php');
+	$Config = new Config;
+	$config = $Config->read();
+	$folder = str_replace(basename($_SERVER['SCRIPT_NAME']),'',$_SERVER['SCRIPT_NAME']);
+	
+	$Xajax   = new xajax();
+	//include('backend.php');
+	
+	$Backend = new Backend($Xajax,$Config);
+	
+	//$Xajax->register(XAJAX_FUNCTION, new xajaxUserFunction('refresh', $Backend, 'refresh'));
+	$Xajax->processRequest();
+	
+	
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -13,39 +23,24 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 
 	<!-- css -->
-	<link rel="stylesheet" href="bootstrap/3.3.4/css/bootstrap.min.css">
-	<link rel="stylesheet" href="bootstrap/3.3.4/css/bootstrap-theme.min.css">
+	<link rel="stylesheet" href="vendor/components/bootstrap/css/bootstrap.min.css">
+	<link rel="stylesheet" href="vendor/components/bootstrap/css/bootstrap-theme.min.css">
 	<link rel="stylesheet" href="css/style.css">
 
 	<!-- js -->
-	<script src="jquery/1.11.2/jquery.min.js"></script>
-	<script src="bootstrap/3.3.4/js/bootstrap.min.js"></script>
+	<script src="vendor/components/jquery/jquery.min.js"></script>
+	<script src="vendor/components/bootstrap/js/bootstrap.min.js"></script>
 	<script src="js/script.js"></script>
 	
 	
 	<!-- start xajax-js-->
-	<?php 
-	$xajax->configure('javascript URI','/fsapi-remote/xajax/');
-	$xajax->printJavascript(); 
-	// determine active device
+	<?php
 	
-	if(!isset($_REQUEST['setup']) || $_REQUEST['setup'] != true){
-		echo '<script type="text/javascript">';
-		$i = 0;
-		$act_device  = "";
-		foreach($configs[1]  as $key => $config){
-			if($i == 0){
-				$act_device = $key;
-			}elseif(isset($config['active']) && ($config['active'] == true)) {
-				$act_device = $key;
-				echo 'console.log("loading last active device: '.$key.'");';
-			}
-			$i ++;
-		}
-		
-		echo "xajax_devicesel(".$act_device.");";
-	}
-	echo '</script>';
+	
+
+	//die($_SERVER["REQUEST_URI"].'vendor/xajax/');
+	$Xajax->configure('javascript URI',$folder .'vendor/xajax/xajax/');
+	$Xajax->printJavascript(); 
 	?>
 	<!-- end xajax-js-->
 	</head>
@@ -80,9 +75,12 @@
 			  		<form class="form-inline" style="margin-top: 7px;">
 					<select class="form-control" id="devicesel">
 						<?php
-
-						foreach($configs[1] as $index => $config){
-							echo  '<option value="'.$index.'">'.$config['friendlyname'].'</option>';
+						foreach($config as $index => $config){
+							$selected = '';
+							if($Backend->getActiveDevice() == $index){
+								$selected = 'selected="selected"';
+							}
+							echo  '<option value="'.$index.'" '.$selected.' >'.$config['friendlyname'].'</option>';
 						}
 						?>
 					</select>
@@ -122,7 +120,6 @@
 		}
 		?>
 		<script type="text/javascript">
-
 				$('#devicesel').change( function() {
 						xajax_devicesel($(this).val());
 				});

@@ -1,0 +1,8 @@
+{
+    "require": {
+        "components/jquery": "1.11.*",
+        "components/bootstrap": "3.3.*",
+        "xajax/xajax": "dev-master",
+        "flammy/fsapi": "dev-master"
+    }
+}

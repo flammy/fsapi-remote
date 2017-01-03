@@ -27,9 +27,12 @@
 				$(this).html(value);
 			}
             // Input of type slider
-			if($(this).hasClass('slider')){
+			if($(this).hasClass('progress-bar')){
 				console.log('changing value to: '+value);
-				$(this).val(value);
+            percentage = (value*100)/20;
+				$(this).width(percentage+'%');
+            $(this).html(value);
+            $(this).attr('aria-valuenow',value)
 			}
             // image src
 			if($(this).hasClass('media-object')){

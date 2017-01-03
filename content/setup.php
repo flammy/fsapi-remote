@@ -23,7 +23,7 @@
 			  <div class="col-md-4">
 			  <div class="well">
 			  <h2>add device</h2>
-				<form>
+				<form id="entries">
 				<input type="hidden" class="form-control" autocomplete="off" value="N" name="index" id="index">
 				  <div class="form-group">
 				    <label for="host">IP / Hostname</label>

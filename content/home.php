@@ -3,39 +3,74 @@
 		<div class="container">
 			<div class="row">
 			  <div class="col-md-12">
-				<div class="media">
-				  <div class="media-left media-middle">
-				    <a href="#">
-				      <img class="media-object netRemote_play_info_graphicUri" src="logo.png" alt="wdr2">
-				    </a>
-				  </div>
-				  <div class="media-body">
-				    <h4 class="txt netRemote_play_info_name media-heading">-</h4>
-				    <h5 class="txt netRemote_play_info_text">-</h5>
-				  </div>
-			  	</div>
+
 			  </div>
 			</div>
+			
 			<div class="row">
-			  <div class="col-md-12">
-					<button type="button" id="play-step-backwar" class="disabled btn btn-default"><span class="glyphicon glyphicon-step-backward" aria-label="Left Align" aria-hidden="true"></span></button>
+			  <div class="col-md-4">
+					<div class="panel panel-default">
+					  <div class="panel-heading">Now Playing</div>
+					  <div class="panel-body">
+					<div class="media">
+					  <div class="media-left media-middle">
+						<a href="#">
+						  <img class="media-object netRemote_play_info_graphicUri" src="logo.png" alt="wdr2">
+						</a>
+					  </div>
+					  <div class="media-body">
+						<h4 class="txt netRemote_play_info_name media-heading">-</h4>
+						<h5 class="txt netRemote_play_info_text">-</h5>
+					  </div>
+					</div>
+					<br/>
+					<button type="button" id="play-step-backwar" class="btn btn-default"><span class="glyphicon glyphicon-step-backward" aria-label="Left Align" aria-hidden="true"></span></button>
 
-					<button type="button" id="play-start" class="disabled btn btn-default netRemote_play_status_play"><span class="glyphicon glyphicon-play" aria-label="Left Align" aria-hidden="true"></span></button>
+					<button type="button" id="play-start" class="btn btn-default netRemote_play_status_play"><span class="glyphicon glyphicon-play" aria-label="Left Align" aria-hidden="true"></span></button>
 
-					<button type="button" id="play-pause" class="disabled btn btn-default netRemote_play_status_pause"><span class="glyphicon glyphicon-pause" aria-label="Left Align" aria-hidden="true"></span></button>
+					<button type="button" id="play-pause" class="btn btn-default netRemote_play_status_pause"><span class="glyphicon glyphicon-pause" aria-label="Left Align" aria-hidden="true"></span></button>
 
-					<button type="button" id="play-stop" class="disabled btn btn-default  netRemote_play_status_stop"><span class="glyphicon glyphicon-stop" aria-label="Left Align" aria-hidden="true"></span></button>
+					<button type="button" id="play-stop" class="btn btn-default  netRemote_play_status_stop"><span class="glyphicon glyphicon-stop" aria-label="Left Align" aria-hidden="true"></span></button>
 
-					<button type="button" id="play-step-forward" class="disabled btn btn-default"><span class="glyphicon glyphicon-step-forward" aria-label="Left Align" aria-hidden="true"></span></button>
-
+					<button type="button" id="play-step-forward" class="btn btn-default"><span class="glyphicon glyphicon-step-forward" aria-label="Left Align" aria-hidden="true"></span></button>
+					&nbsp;&nbsp;
 					<button type="button" id="play-random" class=" btn btn-default netRemote_play_shuffle"><span class="glyphicon glyphicon-random" aria-label="Shuffle / Random" aria-hidden="true"></span></button>
 					<button type="button" id="play-repeat" class=" btn btn-default netRemote_play_repeat"><span class="glyphicon glyphicon-retweet" aria-label="Repeat" aria-hidden="true"></span></button>
-
-					<button type="button" id="volume-down" class="btn  btn-default"><span class="glyphicon glyphicon-volume-down" aria-label="Left Align" aria-hidden="true"></span></button>
-					<input type="text"  id="volume"  class="slider netRemote_sys_audio_volume" value="1" data-slider-min="0" data-slider-max="20" data-slider-step="1" data-slider-value="1" data-slider-orientation="horizontal" data-slider-selection="after" data-slider-tooltip="hide">
-					<button type="button" id="volume-up" class="btn  btn-default"><span class="glyphicon glyphicon-volume-up" aria-label="Left Align" aria-hidden="true"></span></button>
-					<button type="button" id="volume-mute" class="btn btn-default netRemote_sys_audio_mute"><span class="glyphicon glyphicon-volume-off" aria-label="Left Align" aria-hidden="true"></span></button>
-
+					  </div>
+					</div>
+				
+				
+			  </div>
+			  <div class="col-md-4">
+					<div class="panel panel-default">
+					  <div class="panel-heading">Volume &amp; Sound</div>
+					  <div class="panel-body">
+						<button type="button" id="volume-down" class="btn  btn-default"><span class="glyphicon glyphicon-volume-down" aria-label="Left Align" aria-hidden="true"></span></button>					
+						<div class="progress" style="display: inline-block; margin: 0px; width: 50%">
+							<div class="progress-bar netRemote_sys_audio_volume" role="progressbar " aria-valuenow="0" aria-valuemin="0" aria-valuemax="20" style="width: 0%;">
+							</div>
+					  	</div>
+						<button type="button" id="volume-up" class="btn  btn-default"><span class="glyphicon glyphicon-volume-up" aria-label="Left Align" aria-hidden="true"></span></button>
+						<button type="button" id="volume-mute" class="btn btn-default netRemote_sys_audio_mute"><span class="glyphicon glyphicon-volume-off" aria-label="Left Align" aria-hidden="true"></span></button>
+						<br/><br/>
+						<div class="progress" style="display: inline-block; margin: 0px; width: 50%">
+							<div class="progress-bar netRemote_sys_audio_eqCustom_param0" role="progressbar " aria-valuenow="0" aria-valuemin="0" aria-valuemax="20" style="width: 0%;">
+							</div>
+						</div>
+						<br/><br/>
+						<div class="progress" style="display: inline-block; margin: 0px; width: 50%">
+							<div class="progress-bar netRemote_sys_audio_eqCustom_param1" role="progressbar " aria-valuenow="0" aria-valuemin="0" aria-valuemax="20" style="width: 0%;">
+							</div>
+						</div>
+					  </div>
+					</div>
+			  </div>
+			  <div class="col-md-4">
+					<div class="list-group netRemote_sys_caps_eqPresets_list">
+					  <a href="#" class="list-group-item disabled">
+					    Loading EQS
+					  </a>
+					</div>
 			  </div>
 			</div>
 		</div>
@@ -61,7 +96,7 @@
 			  <div class="col-md-4">
 					<div class="list-group netRemote_nav_list">
 					  <a href="#" class="list-group-item disabled">
-					    Loading Channels
+					    Loading Menu
 					  </a>
 					</div>
 			  </div>
@@ -69,22 +104,10 @@
 		<br/>
 			<div class="row">
 			  <div class="col-md-4">
-					<div class="list-group netRemote_sys_caps_eqPresets_list">
-					  <a href="#" class="list-group-item disabled">
-					    Loading EQS
-					  </a>
-					</div>
+
 			  </div>
 			  <div class="col-md-4">
-				<div class="panel panel-default">
-				  <div class="panel-heading">Custom EQS</div>
-				  <div class="panel-body">
-						<input type="text" id="sl1" class="slider netRemote_sys_audio_eqCustom_param0" value="" data-slider-min="-20" data-slider-max="20" data-slider-step="1" data-slider-value="-14" data-slider-orientation="horizontal" data-slider-selection="after"data-slider-tooltip="hide">
-						<input type="text"  id="sl2" class="slider netRemote_sys_audio_eqCustom_param1" value="" data-slider-min="-20" data-slider-max="20" data-slider-step="1" data-slider-value="-14" data-slider-orientation="horizontal" data-slider-selection="after"data-slider-tooltip="hide">
-				  </div>
-				</div>
-
-			  	</div>
+				
 			  	<div class="col-md-4">
 				</div>
 			</div>
@@ -797,7 +820,7 @@
 				/*
 				 *	Get all values via xajax
 				 */
-				//xajax_refresh();
+				xajax_refresh();
 				/*	not ready yet		
 				 *	$('.slider').slider();
 				 */
