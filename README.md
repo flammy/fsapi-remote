@@ -8,6 +8,8 @@ As an example I created an radio-gui (website) with xajax, jquery and bootstrap.
 
 ## install
 
+### composer
+
 You can use composer to install all necessary dependencies:
 
 ```bash
@@ -17,6 +19,12 @@ cd fsapi-remote-master
 
 composer install
 ```
+### artifact
+
+You can download an prebuild artefact of every release on the release page.
+
+### after install
+
 
 Now you can open the page in the browser and add your device with the setup button in the navigation bar.
 
