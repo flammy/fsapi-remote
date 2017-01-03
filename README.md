@@ -6,16 +6,33 @@ Example Code how to use the fsapi (Frontier Silicon API for PHP):
 
 As an example I created an radio-gui (website) with xajax, jquery and bootstrap.
 
-clone fsapi-remote and fsapi
+## install
 
-git clone https://github.com/flammy/fsapi-remote.git
+You can use composer to install all necessary dependencies:
 
-cd fsapi-remote
+```bash
+unzip master.zip
 
-git clone https://github.com/flammy/fsapi.git
+cd fsapi-remote-master
 
-Make sure your webserver has write-access to config.txt.
+composer install
+```
 
-Now you can add your device with the setup button in the navigation bar.
+Now you can open the page in the browser and add your device with the setup button in the navigation bar.
 
 If you have any feature requests or found some bugs, please open an issue.
+
+
+## troubleshooting
+
+Make sure your webserver has write-access to the following files and folders
+
+/config.txt
+
+/vendor/xajax/xajax/xajax_js/deferred/
+
+
+
+
+
+
