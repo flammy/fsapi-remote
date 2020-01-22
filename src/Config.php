@@ -22,14 +22,14 @@ class Config{
 		$this->basedir = dirname(__FILE__).DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR;
 		$this->file = $this->basedir.'config.txt';
 		if(!file_exists($this->file )){
-			if(!is_writable ($this->file)){
-				throw new ConfigException(sprintf('file '.$this->file.' is not writable by the webserver'));
-			}
 			$result = file_put_contents($this->file,serialize(array()));
 			if($result === false){
 				throw new ConfigException(sprintf('file '.$this->file.' could not be written'));
 			}
 		}
+		else if(!is_writable ($this->file)){
+				throw new ConfigException(sprintf('file '.$this->file.' is not writable by the webserver'));
+			}
 	}
 	
 	
