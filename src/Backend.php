@@ -67,7 +67,7 @@ class Backend{
 			return false;
 		}
 		$this->activeDevice = $act_device;
-		return new Radio($config[$act_device]['host'],$config[$act_device]['pin']);
+		return new FSAPI\Radio($config[$act_device]['host'],$config[$act_device]['pin']);
 	}
 	
 	
